@@ -96,3 +96,35 @@ class BrowserHistory:
             node = node.next
 
         print("-----------------------")
+
+    def export_history(self, filename):
+        with open(filename, "w", encoding="utf-8") as file:
+            node = self.head
+
+            while node is not None:
+                file.write(node.url + "\n")
+                node = node.next
+
+        print("History exported to:", filename)
+
+    def import_history(self, filename):
+        try:
+            with open(filename, "r", encoding="utf-8") as file:
+                urls = [line.strip() for line in file if line.strip()]
+
+            if not urls:
+                print("Import file is empty.")
+                return
+
+            self.head = Node(urls[0])
+            self.tail = self.head
+            self.current = self.head
+            self.size = 1
+
+            for url in urls[1:]:
+                self.visit(url)
+
+            print("History imported from:", filename)
+
+        except FileNotFoundError:
+            print("File not found:", filename)
