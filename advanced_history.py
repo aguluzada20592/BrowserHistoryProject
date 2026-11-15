@@ -94,3 +94,16 @@ class AdvancedBrowserHistory(BrowserHistory):
             self.size -= 1
         print("Restored:", url)
         return True
+    def delete_history(self):
+        node = self.head
+        while node is not None:
+            next_node = node.next
+            node.prev = None
+            node.next = None
+            node = next_node
+        self.head = None
+        self.tail = None
+        self.current = None
+        self.size = 0
+        self.deleted_stack.clear()
+        print("All browser history has been deleted.")

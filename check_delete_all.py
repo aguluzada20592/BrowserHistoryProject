@@ -1,0 +1,15 @@
+from advanced_history import AdvancedBrowserHistory
+
+browser = AdvancedBrowserHistory("google.com")
+browser.visit("youtube.com")
+browser.visit("github.com")
+print("BEFORE DELETION:")
+browser.display_history()
+browser.delete_history()
+print("\nAFTER DELETION:")
+browser.display_history()
+print("\nCurrent page:", browser.current_page())
+print("Total pages:", browser.size)
+print("\nVISITING A NEW PAGE:")
+browser.visit("stackoverflow.com")
+browser.display_history()
