@@ -98,22 +98,50 @@ class BrowserHistory:
         print("-----------------------")
 
     def export_history(self, filename):
-        with open(filename, "w", encoding="utf-8") as file:
-            node = self.head
+        try:
+            with open(filename, "w", encoding="utf-8") as file:
+                position = self._current_position()
+                file.write(f"CURRENT_POSITION:{position}\n")
 
-            while node is not None:
-                file.write(node.url + "\n")
-                node = node.next
+                node = self.head
 
-        print("History exported to:", filename)
+                while node is not None:
+                    file.write(node.url + "\n")
+                    node = node.next
+
+            print("History exported to:", filename)
+
+        except OSError as error:
+            print("Export failed:", error)
 
     def import_history(self, filename):
         try:
             with open(filename, "r", encoding="utf-8") as file:
-                urls = [line.strip() for line in file if line.strip()]
+                lines = [line.strip() for line in file if line.strip()]
+
+            if not lines:
+                print("Import file is empty.")
+                return
+
+            position = None
+
+            if lines[0].startswith("CURRENT_POSITION:"):
+                try:
+                    position = int(lines[0].split(":", 1)[1])
+                except ValueError:
+                    print("Invalid current page position.")
+                    return
+
+                urls = lines[1:]
+            else:
+                urls = lines
 
             if not urls:
-                print("Import file is empty.")
+                print("Import file contains no URLs.")
+                return
+
+            if position is not None and not (1 <= position <= len(urls)):
+                print("Invalid current page position.")
                 return
 
             self.head = Node(urls[0])
@@ -124,7 +152,10 @@ class BrowserHistory:
             for url in urls[1:]:
                 self.visit(url)
 
+            if position is not None:
+                self.back(self.size - position)
+
             print("History imported from:", filename)
 
-        except FileNotFoundError:
-            print("File not found:", filename)
+        except OSError as error:
+            print("Import failed:", error)
